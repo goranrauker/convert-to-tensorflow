@@ -25,6 +25,8 @@ if __name__ == '__main__':
     model_output = model.output.name.replace(':0', '')
 
     sess = K.get_session()
+
+    # END OF keras specific code
     graph_def = sess.graph.as_graph_def()
 
     tf.train.Saver().save(sess, model_file_basename + '.ckpt')
