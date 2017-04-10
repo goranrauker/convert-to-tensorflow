@@ -1,4 +1,5 @@
 import argparse
+from freeze import freeze
 import keras
 import keras.backend as K
 import os
@@ -26,35 +27,7 @@ if __name__ == '__main__':
 
     sess = K.get_session()
 
+    width, height, channels = int(model.input.shape[2]), int(model.input.shape[1]), int(model.input.shape[3])
     # END OF keras specific code
-    graph_def = sess.graph.as_graph_def()
 
-    tf.train.Saver().save(sess, model_file_basename + '.ckpt')
-    tf.train.write_graph(sess.graph.as_graph_def(), logdir='.', name=model_file_basename + '.binary.pb', as_text=not input_binary)
-
-    # We save out the graph to disk, and then call the const conversion routine.
-    checkpoint_state_name = model_file_basename + ".ckpt.index"
-    input_graph_name = model_file_basename + ".binary.pb"
-    output_graph_name = model_file_basename + ".pb"
-
-    input_graph_path = os.path.join(".", input_graph_name)
-    input_saver_def_path = ""
-    input_checkpoint_path = os.path.join(".", model_file_basename + '.ckpt')
-
-    output_node_names = model_output
-    restore_op_name = "save/restore_all"
-    filename_tensor_name = "save/Const:0"
-
-    output_graph_path = os.path.join(args.output_path, output_graph_name)
-    clear_devices = False
-
-    freeze_graph(input_graph_path, input_saver_def_path,
-                 input_binary, input_checkpoint_path,
-                 output_node_names, restore_op_name,
-                 filename_tensor_name, output_graph_path,
-                 clear_devices, "")
-
-    print("Model loaded from: %s" % model_file_basename)
-    print("Output written to: %s" % output_graph_path)
-    print("Model input name : %s" % model_input)
-    print("Model output name: %s" % model_output)
+    freeze(sess, model_file_basename, model_input, width, height, channels, model_output)
