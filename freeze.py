@@ -4,15 +4,15 @@ from tensorflow.python.tools.freeze_graph import freeze_graph
 
 
 def freeze(tf_session, model_name, model_input_name, width, height, channels, model_output_name):
-
     input_binary = True
-    graph_def = tf_session.graph.as_graph_def()
 
     tf.train.Saver().save(tf_session, model_name + '.ckpt')
-    tf.train.write_graph(tf_session.graph.as_graph_def(), logdir='.', name=model_name + '.binary.pb', as_text=not input_binary)
+    tf.train.write_graph(tf_session.graph.as_graph_def(),
+                         logdir='/tmp/freeze/',
+                         name=model_name + '.binary.pb',
+                         as_text=not input_binary)
 
     # We save out the graph to disk, and then call the const conversion routine.
-    checkpoint_state_name = model_name + ".ckpt.index"
     input_graph_name = model_name + ".binary.pb"
     output_graph_name = model_name + ".pb"
 
